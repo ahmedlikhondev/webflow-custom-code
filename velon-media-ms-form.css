@@ -1,0 +1,6 @@
+.form-step-v2 {
+  display: none;
+}
+.form-step-v2.active {
+  display: block;
+}
