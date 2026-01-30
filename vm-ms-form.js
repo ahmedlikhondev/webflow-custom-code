@@ -87,9 +87,10 @@ window.Webflow.push(function () {
     }
 
     /* ---- Checkboxes (different names, at least one required) ---- */
+    // Only check checkboxes in current step
     const visibleCheckboxes = Array.from(
       step.querySelectorAll("input[type='checkbox']")
-    ).filter(cb => cb.offsetParent !== null);
+    ).filter(cb => cb.closest(".form-step") === step);
 
     if (visibleCheckboxes.length) {
       const oneChecked = visibleCheckboxes.some(cb => cb.checked);
@@ -136,6 +137,7 @@ window.Webflow.push(function () {
 
     syncCheckboxValues(this.closest("form"));
 
+    // Step-4 disqualified redirect
     if (currentStep === 3 && isDisqualifiedStep4) {
       window.location.href = "https://velonmedia.com/disqualified";
       return;
