@@ -1,0 +1,21 @@
+/* Step transition animation */
+.form-step {
+  display: none;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.form-step.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.form-step {
+  display: none;
+}
+.form-step.active {
+  display: block;
+}
+
