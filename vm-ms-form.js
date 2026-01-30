@@ -6,6 +6,8 @@ window.Webflow.push(function () {
   const prevBtn = document.querySelector(".prev-btn");
   const submitBtn = document.querySelector(".submit-button");
 
+  if (!steps.length || !nextBtn || !prevBtn) return;
+
   let currentStep = 0;
   let isDisqualifiedStep4 = false;
 
@@ -33,6 +35,8 @@ window.Webflow.push(function () {
      SYNC CHECKBOX TRUE / FALSE
   ========================= */
   function syncCheckboxValues(form) {
+    if (!form) return;
+
     const checkboxes = form.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(cb => {
       const hidden = form.querySelector(
@@ -50,31 +54,31 @@ window.Webflow.push(function () {
   function validateCurrentStep() {
     const step = steps[currentStep];
 
-    /* ---- Text, email, select, textarea ---- */
+    /* ---- Text / Select / Textarea ---- */
     const fields = step.querySelectorAll(
       "input:not([type='radio']):not([type='checkbox']), select, textarea"
     );
 
-    for (let field of fields) {
+    for (const field of fields) {
       if (!field.checkValidity()) {
         field.reportValidity();
         return false;
       }
     }
 
-    /* ---- Radio groups ---- */
+    /* ---- Radio Groups ---- */
     const radioGroups = {};
     step.querySelectorAll("input[type='radio']").forEach(radio => {
       if (!radioGroups[radio.name]) radioGroups[radio.name] = [];
       radioGroups[radio.name].push(radio);
     });
 
-    for (let name in radioGroups) {
+    for (const name in radioGroups) {
       const group = radioGroups[name];
-      const isRequired = group.some(r => r.required);
-      const isChecked = group.some(r => r.checked);
+      const required = group.some(r => r.required);
+      const checked = group.some(r => r.checked);
 
-      if (isRequired && !isChecked) {
+      if (required && !checked) {
         group[0].setCustomValidity("Please select one option");
         group[0].reportValidity();
         group[0].setCustomValidity("");
@@ -87,9 +91,9 @@ window.Webflow.push(function () {
       step.querySelectorAll("input[type='checkbox']")
     ).filter(cb => cb.offsetParent !== null);
 
-    if (visibleCheckboxes.length > 0) {
-      const atLeastOneChecked = visibleCheckboxes.some(cb => cb.checked);
-      if (!atLeastOneChecked) {
+    if (visibleCheckboxes.length) {
+      const oneChecked = visibleCheckboxes.some(cb => cb.checked);
+      if (!oneChecked) {
         alert("Please select at least one option");
         visibleCheckboxes[0].focus();
         return false;
@@ -112,12 +116,11 @@ window.Webflow.push(function () {
 
     radiosStep4.forEach(radio => {
       radio.addEventListener("change", function () {
-        if (this.value === "800") {
-          isDisqualifiedStep4 = true;
-          if (disqualifiedMsg) disqualifiedMsg.style.display = "block";
-        } else {
-          isDisqualifiedStep4 = false;
-          if (disqualifiedMsg) disqualifiedMsg.style.display = "none";
+        const disqualified = this.value === "800";
+        isDisqualifiedStep4 = disqualified;
+
+        if (disqualifiedMsg) {
+          disqualifiedMsg.style.display = disqualified ? "block" : "none";
         }
       });
     });
@@ -133,7 +136,6 @@ window.Webflow.push(function () {
 
     syncCheckboxValues(this.closest("form"));
 
-    /* ---- Step-4 disqualified redirect ---- */
     if (currentStep === 3 && isDisqualifiedStep4) {
       window.location.href = "https://velonmedia.com/disqualified";
       return;
@@ -171,12 +173,8 @@ window.Webflow.push(function () {
      SCROLL TO TOP
   ========================= */
   function scrollToTop() {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   showStep(currentStep);
 });
-
