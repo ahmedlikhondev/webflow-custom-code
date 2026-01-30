@@ -1,4 +1,3 @@
-<script>
 document.addEventListener("DOMContentLoaded", function () {
 
   const steps = document.querySelectorAll(".form-step-v2");
@@ -125,9 +124,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   showStep(currentStep);
 });
-</script>
 
-<script>
+
+
 document.addEventListener("DOMContentLoaded", function () {
 
   const nextBtn = document.querySelector(".next-btn-v2");
@@ -153,4 +152,4 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 });
-</script>
+
