@@ -6,55 +6,33 @@ window.Webflow.push(function () {
   const prevBtn = document.querySelector(".prev-btn-v2");
   const submitBtn = document.querySelector(".submit-button-v2");
 
-  if (!steps.length || !nextBtn || !prevBtn) return;
+  if (!steps.length) return;
 
   let currentStep = 0;
-  let isDisqualifiedStep4 = false;
 
   if (submitBtn) submitBtn.style.display = "none";
 
-  /* =========================
-     SHOW STEP
-  ========================= */
+  // =========================
+  // SHOW STEP
+  // =========================
   function showStep(index) {
     steps.forEach(step => step.classList.remove("active"));
     steps[index].classList.add("active");
 
-    prevBtn.style.display = index === 0 ? "none" : "inline-block";
-
-    if (index === steps.length - 1) {
-      nextBtn.style.display = "none";
-      if (submitBtn) submitBtn.style.display = "inline-block";
-    } else {
-      nextBtn.style.display = "inline-block";
-      if (submitBtn) submitBtn.style.display = "none";
-    }
+    if (prevBtn) prevBtn.style.display = index === 0 ? "none" : "inline-block";
+    if (nextBtn) nextBtn.style.display = index === steps.length - 1 ? "none" : "inline-block";
+    if (submitBtn) submitBtn.style.display = index === steps.length - 1 ? "inline-block" : "none";
   }
 
-  /* =========================
-     SYNC CHECKBOX TRUE / FALSE
-  ========================= */
-  function syncCheckboxValues(form) {
-    if (!form) return;
-    const checkboxes = form.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(cb => {
-      const hidden = form.querySelector(
-        `input[type="hidden"][name="${cb.name}"]`
-      );
-      if (hidden) hidden.value = cb.checked ? "true" : "false";
-    });
-  }
-
-  /* =========================
-     VALIDATE CURRENT STEP
-  ========================= */
+  // =========================
+  // VALIDATE STEP
+  // =========================
   function validateCurrentStep() {
     const step = steps[currentStep];
 
     const fields = step.querySelectorAll(
       "input:not([type='radio']):not([type='checkbox']), select, textarea"
     );
-
     for (let field of fields) {
       if (!field.checkValidity()) {
         field.reportValidity();
@@ -72,7 +50,6 @@ window.Webflow.push(function () {
       const group = radioGroups[name];
       const isRequired = group.some(r => r.required);
       const isChecked = group.some(r => r.checked);
-
       if (isRequired && !isChecked) {
         group[0].setCustomValidity("Please select one option");
         group[0].reportValidity();
@@ -96,74 +73,62 @@ window.Webflow.push(function () {
     return true;
   }
 
-  /* =========================
-     STEP-4 DISQUALIFICATION
-  ========================= */
-  const step4 = steps[3];
-  const disqualifiedMsg = document.querySelector(".disqualified-msg");
-
-  if (step4) {
-    step4
-      .querySelectorAll('input[type="radio"][name="monthly_investment"]')
-      .forEach(radio => {
-        radio.addEventListener("change", function () {
-          isDisqualifiedStep4 = this.value === "800";
-          if (disqualifiedMsg) {
-            disqualifiedMsg.style.display = isDisqualifiedStep4 ? "block" : "none";
-          }
-        });
-      });
+  // =========================
+  // SYNC CHECKBOXES
+  // =========================
+  function syncCheckboxValues(form) {
+    if (!form) return;
+    const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(cb => {
+      const hidden = form.querySelector(`input[type="hidden"][name="${cb.name}"]`);
+      if (hidden) hidden.value = cb.checked ? "true" : "false";
+    });
   }
 
-  /* =========================
-     NEXT BUTTON
-  ========================= */
-  nextBtn.addEventListener("click", function (e) {
-    e.preventDefault();
+  // =========================
+  // BUTTON EVENTS
+  // =========================
+  if (nextBtn) {
+    nextBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (!validateCurrentStep()) return;
+      syncCheckboxValues(this.closest("form"));
 
-    if (!validateCurrentStep()) return;
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        showStep(currentStep);
+        scrollToTop();
+      }
+    });
+  }
 
-    syncCheckboxValues(this.closest("form"));
+  if (prevBtn) {
+    prevBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (currentStep > 0) {
+        currentStep--;
+        showStep(currentStep);
+        scrollToTop();
+      }
+    });
+  }
 
-    if (currentStep === 3 && isDisqualifiedStep4) {
-      window.location.href = "https://velonmedia.com/disqualified";
-      return;
-    }
-
-    if (currentStep < steps.length - 1) {
-      currentStep++;
-      showStep(currentStep);
-      scrollToTop();
-    }
-  });
-
-  /* =========================
-     PREVIOUS BUTTON
-  ========================= */
-  prevBtn.addEventListener("click", function (e) {
-    e.preventDefault();
-    if (currentStep > 0) {
-      currentStep--;
-      showStep(currentStep);
-      scrollToTop();
-    }
-  });
-
-  /* =========================
-     SUBMIT BUTTON
-  ========================= */
   if (submitBtn) {
     submitBtn.addEventListener("click", function () {
       syncCheckboxValues(this.closest("form"));
     });
   }
 
-  /* =========================
-     SCROLL TO TOP
-  ========================= */
+  // =========================
+  // SCROLL TO TOP
+  // =========================
   function scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  // =========================
+  // INIT
+  // =========================
   showStep(currentStep);
+
 });
