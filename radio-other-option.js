@@ -1,7 +1,7 @@
 window.Webflow ||= [];
 window.Webflow.push(function () {
 
-  const otherRadio = document.getElementById('other-radio');
+  const otherRadio = document.getElementById('other-radio2');
   const otherInput = document.getElementById('other-radio-input');
 
   if (!otherRadio || !otherInput) return;
