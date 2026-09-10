@@ -1,1 +1,480 @@
+<title>The World Tour</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#FAF8F3;
+  --surface:#FFFFFF;
+  --surface-2:#F1EEE6;
+  --ink:#15130F;
+  --muted:#6E6A61;
+  --line:#E3DFD3;
+  --red:#E30613;
+  --red-dark:#B8050F;
+  --red-tint:#FDEAEA;
+  --shadow: 0 1px 2px rgba(20,15,5,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#121110;
+    --surface:#191714;
+    --surface-2:#211E19;
+    --ink:#F3F0E8;
+    --muted:#9C978B;
+    --line:#332F27;
+    --red:#FF4650;
+    --red-dark:#FF7078;
+    --red-tint:#2B1512;
+    --shadow: 0 1px 2px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121110;
+  --surface:#191714;
+  --surface-2:#211E19;
+  --ink:#F3F0E8;
+  --muted:#9C978B;
+  --line:#332F27;
+  --red:#FF4650;
+  --red-dark:#FF7078;
+  --red-tint:#2B1512;
+  --shadow: 0 1px 2px rgba(0,0,0,.4);
+}
+
+*{box-sizing:border-box;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Outfit',Arial,sans-serif;
+  margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums;}
+
+.wrap{max-width:1120px; margin:0 auto; padding:0 28px;}
+
+/* ---------- HERO ---------- */
+.hero{padding:76px 0 44px; border-bottom:1px solid var(--line);}
+.hero-eyebrow{
+  display:flex; align-items:center; gap:10px;
+  font-size:12px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--red); margin-bottom:22px;
+}
+.hero-eyebrow::before{content:""; width:22px; height:2px; background:var(--red); display:inline-block;}
+.hero-grid{display:grid; grid-template-columns:1.35fr 1fr; gap:48px; align-items:end;}
+h1.title{
+  font-size:clamp(40px,6vw,74px); font-weight:900; line-height:0.98; letter-spacing:-.02em;
+  margin:0; text-wrap:balance;
+}
+h1.title em{font-style:normal; color:var(--red);}
+.hero-sub{
+  font-size:17px; line-height:1.55; color:var(--muted); max-width:46ch; margin:22px 0 0;
+}
+.stamp{
+  justify-self:end; text-align:right; border:1.5px solid var(--line); border-radius:4px;
+  padding:20px 22px; background:var(--surface); box-shadow:var(--shadow);
+}
+.stamp .n{font-family:'JetBrains Mono',monospace; font-size:56px; font-weight:600; line-height:1; color:var(--red);}
+.stamp .l{font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-top:6px;}
+
+/* ---------- STAT STRIP ---------- */
+.stats{
+  display:grid; grid-template-columns:repeat(4,1fr);
+  border-bottom:1px solid var(--line);
+}
+.stat{
+  padding:26px 28px; border-left:1px solid var(--line);
+}
+.stat:first-child{border-left:none;}
+.stat .num{font-family:'JetBrains Mono',monospace; font-size:30px; font-weight:600; letter-spacing:-.01em;}
+.stat .lab{font-size:12.5px; color:var(--muted); margin-top:4px;}
+
+/* ---------- INTRO ---------- */
+.intro{padding:52px 0 8px; display:grid; grid-template-columns:200px 1fr; gap:40px;}
+.intro h2{font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:6px 0 0; font-weight:600;}
+.intro p{font-size:16.5px; line-height:1.65; max-width:64ch; margin:0; color:var(--ink);}
+.intro p + p{margin-top:14px;}
+
+/* ---------- CONTROLS ---------- */
+.controls{
+  position:sticky; top:0; z-index:5; background:var(--paper);
+  padding:26px 0 14px; margin-top:26px;
+  border-bottom:1px solid var(--line);
+  display:flex; flex-wrap:wrap; align-items:center; gap:10px 12px;
+}
+.chip{
+  font-family:'Outfit',sans-serif; font-size:13px; font-weight:600; letter-spacing:.02em;
+  border:1px solid var(--line); background:var(--surface); color:var(--ink);
+  padding:8px 14px; border-radius:100px; cursor:pointer; white-space:nowrap;
+}
+.chip[aria-pressed="true"]{background:var(--red); border-color:var(--red); color:#fff;}
+.search-wrap{margin-left:auto; position:relative;}
+#search{
+  font-family:'Outfit',sans-serif; font-size:14px; padding:9px 14px 9px 34px;
+  border:1px solid var(--line); border-radius:100px; background:var(--surface); color:var(--ink);
+  width:220px; outline:none;
+}
+#search:focus{border-color:var(--red);}
+.search-wrap::before{
+  content:"⌕"; position:absolute; left:13px; top:50%; transform:translateY(-50%);
+  color:var(--muted); font-size:15px; pointer-events:none;
+}
+#empty-state{display:none; padding:40px 0; color:var(--muted); font-size:15px;}
+
+/* ---------- REGIONS / TOUR LIST ---------- */
+.regions{padding:8px 0 20px;}
+.region{padding:34px 0 8px;}
+.region-head{
+  display:flex; align-items:baseline; gap:10px; margin-bottom:8px;
+}
+.region-head h3{font-size:22px; font-weight:800; margin:0; letter-spacing:-.01em;}
+.tour-list{list-style:none; margin:6px 0 0; padding:0; border-top:1px solid var(--line);}
+.tour-row{
+  display:grid;
+  grid-template-columns: 190px 170px 1fr 64px;
+  align-items:center; gap:16px;
+  padding:11px 4px;
+  border-bottom:1px solid var(--line);
+  font-size:14.5px;
+}
+.tour-row:hover{background:var(--surface-2);}
+.t-city{font-weight:700;}
+.t-country{color:var(--muted);}
+.t-pills{display:flex; flex-wrap:wrap; gap:6px;}
+.pill{
+  font-size:11.5px; font-weight:600; letter-spacing:.01em;
+  padding:4px 9px; border-radius:100px;
+  background:var(--red-tint); color:var(--red-dark);
+  white-space:nowrap;
+}
+.pill-muted{background:var(--surface-2); color:var(--muted);}
+.t-year{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--muted); text-align:right;}
+
+@media (max-width:760px){
+  .hero-grid{grid-template-columns:1fr;}
+  .stamp{justify-self:start; text-align:left;}
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .stat:nth-child(3){border-left:none;}
+  .intro{grid-template-columns:1fr; gap:10px;}
+  .tour-row{grid-template-columns:1fr 60px; grid-template-areas:"city year" "country country" "pills pills"; row-gap:4px;}
+  .t-city{grid-area:city;} .t-year{grid-area:year;} .t-country{grid-area:country;} .t-pills{grid-area:pills;}
+  .search-wrap{margin-left:0; width:100%;}
+  #search{width:100%;}
+}
+
+footer{border-top:1px solid var(--line); padding:26px 0 60px;}
+footer p{font-size:12.5px; color:var(--muted); margin:0;}
+</style>
+
+<div class="wrap">
+  <div class="controls" id="controls">
+    <button class="chip" data-region="all" aria-pressed="true">All regions</button>
+    <button class="chip" data-region="Europe">Europe</button>
+    <button class="chip" data-region="North America">North America</button>
+    <button class="chip" data-region="Asia">Asia</button>
+    <button class="chip" data-region="Central &amp; South America">C. &amp; S. America</button>
+    <button class="chip" data-region="Australasia">Australasia</button>
+    <button class="chip" data-region="Middle East">Middle East</button>
+    <button class="chip" data-region="Africa">Africa</button>
+    <div class="search-wrap">
+      <input id="search" type="text" placeholder="Search city, country, show…" autocomplete="off">
+    </div>
+  </div>
+
+  <div class="regions" id="regions">
+    <section class="region" data-region="Europe" id="region-europe">
+      <div class="region-head">
+        <h3>Europe</h3>
+      </div>
+      <ul class="tour-list">
+        <li class="tour-row"><span class="t-city">Andorra</span><span class="t-country">Andorra</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2026</span></li>
+        <li class="tour-row"><span class="t-city">Salzburg</span><span class="t-country">Austria</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2023</span></li>
+        <li class="tour-row"><span class="t-city">Brussels</span><span class="t-country">Belgium</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2013</span></li>
+        <li class="tour-row"><span class="t-city">Zagreb</span><span class="t-country">Croatia</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2026</span></li>
+        <li class="tour-row"><span class="t-city">Prague</span><span class="t-country">Czech Rep</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2015</span></li>
+        <li class="tour-row"><span class="t-city">Copenhagen</span><span class="t-country">Denmark</span><span class="t-pills"><span class="pill">Planet Shark</span></span><span class="t-year">2016</span></li>
+        <li class="tour-row"><span class="t-city">Kolding</span><span class="t-country">Denmark</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2014</span></li>
+        <li class="tour-row"><span class="t-city">Odense</span><span class="t-country">Denmark</span><span class="t-pills"><span class="pill">Planet Shark</span></span><span class="t-year">2015</span></li>
+        <li class="tour-row"><span class="t-city">Tampere</span><span class="t-country">Finland</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2025</span></li>
+        <li class="tour-row"><span class="t-city">Paris</span><span class="t-country">France</span><span class="t-pills"><span class="pill">Secrets of Mona Lisa</span></span><span class="t-year">2008</span></li>
+        <li class="tour-row"><span class="t-city">Berlin</span><span class="t-country">Germany</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2013</span></li>
+        <li class="tour-row"><span class="t-city">Cologne</span><span class="t-country">Germany</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2022</span></li>
+        <li class="tour-row"><span class="t-city">Frankfurt</span><span class="t-country">Germany</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2023</span></li>
+        <li class="tour-row"><span class="t-city">Hamburg</span><span class="t-country">Germany</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2022</span></li>
+        <li class="tour-row"><span class="t-city">Munich</span><span class="t-country">Germany</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2021</span></li>
+        <li class="tour-row"><span class="t-city">Nuremberg</span><span class="t-country">Germany</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2014</span></li>
+        <li class="tour-row"><span class="t-city">Athens</span><span class="t-country">Greece</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span></span><span class="t-year">2017 &amp; 2018</span></li>
+        <li class="tour-row"><span class="t-city">Thessaloniki</span><span class="t-country">Greece</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Budapest</span><span class="t-country">Hungary</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2012</span></li>
+        <li class="tour-row"><span class="t-city">Assisi</span><span class="t-country">Italy</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2007</span></li>
+        <li class="tour-row"><span class="t-city">Bari</span><span class="t-country">Italy</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Bologna</span><span class="t-country">Italy</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2017</span></li>
+        <li class="tour-row"><span class="t-city">Cosenza</span><span class="t-country">Italy</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Florence</span><span class="t-country">Italy</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span></span><span class="t-year">2015</span></li>
+        <li class="tour-row"><span class="t-city">Genoa</span><span class="t-country">Italy</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Milan</span><span class="t-country">Italy</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2013</span></li>
+        <li class="tour-row"><span class="t-city">Rome</span><span class="t-country">Italy</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Alice</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2016 - 2018</span></li>
+        <li class="tour-row"><span class="t-city">Rome</span><span class="t-country">Italy</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2014</span></li>
+        <li class="tour-row"><span class="t-city">Turin</span><span class="t-country">Italy</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2016</span></li>
+        <li class="tour-row"><span class="t-city">Venice</span><span class="t-country">Italy</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2008</span></li>
+        <li class="tour-row"><span class="t-city">Verona</span><span class="t-country">Italy</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2017</span></li>
+        <li class="tour-row"><span class="t-city">Vienna</span><span class="t-country">Italy</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2021</span></li>
+        <li class="tour-row"><span class="t-city">Chişinău</span><span class="t-country">Moldova</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2016</span></li>
+        <li class="tour-row"><span class="t-city">Rotterdam</span><span class="t-country">Netherlands</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2010</span></li>
+        <li class="tour-row"><span class="t-city">Jevnaker</span><span class="t-country">Norway</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2019 - 2021</span></li>
+        <li class="tour-row"><span class="t-city">Oslo</span><span class="t-country">Norway</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2023</span></li>
+        <li class="tour-row"><span class="t-city">Krakow</span><span class="t-country">Poland</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2016</span></li>
+        <li class="tour-row"><span class="t-city">Warsaw</span><span class="t-country">Poland</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2015</span></li>
+        <li class="tour-row"><span class="t-city">Lisbon</span><span class="t-country">Portugal</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2017</span></li>
+        <li class="tour-row"><span class="t-city">Bucharest</span><span class="t-country">Romania</span><span class="t-pills"><span class="pill">Planet Shark</span></span><span class="t-year">2014</span></li>
+        <li class="tour-row"><span class="t-city">Ekaterinburg</span><span class="t-country">Russia</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2011</span></li>
+        <li class="tour-row"><span class="t-city">Kazan</span><span class="t-country">Russia</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2011</span></li>
+        <li class="tour-row"><span class="t-city">Minsk</span><span class="t-country">Russia</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2015</span></li>
+        <li class="tour-row"><span class="t-city">Moscow</span><span class="t-country">Russia</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci — The Genius</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2010</span></li>
+        <li class="tour-row"><span class="t-city">Nizhny Novgorod</span><span class="t-country">Russia</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2013</span></li>
+        <li class="tour-row"><span class="t-city">Novosibirsk</span><span class="t-country">Russia</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2010</span></li>
+        <li class="tour-row"><span class="t-city">Saint Petersburg</span><span class="t-country">Russia</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci — The Genius</span><span class="pill">Monet &amp; Friends Alive</span><span class="pill">Planet Shark</span></span><span class="t-year">2010, 2013, 2015</span></li>
+        <li class="tour-row"><span class="t-city">Ljubljana</span><span class="t-country">Slovenia</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2013</span></li>
+        <li class="tour-row"><span class="t-city">Alicante</span><span class="t-country">Spain</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Madrid</span><span class="t-country">Spain</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Malaga</span><span class="t-country">Spain</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2019</span></li>
+        <li class="tour-row"><span class="t-city">Mallorca</span><span class="t-country">Spain</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2022</span></li>
+        <li class="tour-row"><span class="t-city">Pamplona</span><span class="t-country">Spain</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2020</span></li>
+        <li class="tour-row"><span class="t-city">Santander</span><span class="t-country">Spain</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2020</span></li>
+        <li class="tour-row"><span class="t-city">Seville</span><span class="t-country">Spain</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Valencia</span><span class="t-country">Spain</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2019</span></li>
+        <li class="tour-row"><span class="t-city">Halmstad</span><span class="t-country">Sweden</span><span class="t-pills"><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2016</span></li>
+        <li class="tour-row"><span class="t-city">Kalmar</span><span class="t-country">Sweden</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci Inventions</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2018, 2019, 2023</span></li>
+        <li class="tour-row"><span class="t-city">Linkoping</span><span class="t-country">Sweden</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2023</span></li>
+        <li class="tour-row"><span class="t-city">Malmo</span><span class="t-country">Sweden</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2023</span></li>
+        <li class="tour-row"><span class="t-city">Skelleftea</span><span class="t-country">Sweden</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2023</span></li>
+        <li class="tour-row"><span class="t-city">Uppsala</span><span class="t-country">Sweden</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2022</span></li>
+        <li class="tour-row"><span class="t-city">Basel</span><span class="t-country">Switzerland</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2022</span></li>
+        <li class="tour-row"><span class="t-city">Lausanne</span><span class="t-country">Switzerland</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2021</span></li>
+        <li class="tour-row"><span class="t-city">Lugano</span><span class="t-country">Switzerland</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2019</span></li>
+        <li class="tour-row"><span class="t-city">Zurich</span><span class="t-country">Switzerland</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2020</span></li>
+        <li class="tour-row"><span class="t-city">Ankara</span><span class="t-country">Turkey</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2012</span></li>
+        <li class="tour-row"><span class="t-city">Istanbul</span><span class="t-country">Turkey</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Planet Shark</span></span><span class="t-year">2012, 2013</span></li>
+        <li class="tour-row"><span class="t-city">Birmingham</span><span class="t-country">UK</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2020</span></li>
+        <li class="tour-row"><span class="t-city">Bradford</span><span class="t-country">UK</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2022</span></li>
+        <li class="tour-row"><span class="t-city">Brighton</span><span class="t-country">UK</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2023</span></li>
+        <li class="tour-row"><span class="t-city">Chester</span><span class="t-country">UK</span><span class="t-pills"><span class="pill">Planet Shark</span></span><span class="t-year">2023</span></li>
+        <li class="tour-row"><span class="t-city">Edinburgh</span><span class="t-country">UK</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2022</span></li>
+        <li class="tour-row"><span class="t-city">London</span><span class="t-country">UK</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2021</span></li>
+        <li class="tour-row"><span class="t-city">Manchester</span><span class="t-country">UK</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2008, 2021</span></li>
+        <li class="tour-row"><span class="t-city">Surrey</span><span class="t-country">UK</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2010</span></li>
+        <li class="tour-row"><span class="t-city">Winchester</span><span class="t-country">UK</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2026</span></li>
+        <li class="tour-row"><span class="t-city">Kiev</span><span class="t-country">Ukraine</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2013</span></li>
+        <li class="tour-row"><span class="t-city">Odessa</span><span class="t-country">Ukraine</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2016</span></li>
+      </ul>
+    </section>
+    <section class="region" data-region="North America" id="region-north-america">
+      <div class="region-head">
+        <h3>North America</h3>
+      </div>
+      <ul class="tour-list">
+        <li class="tour-row"><span class="t-city">Edmonton</span><span class="t-country">Canada</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2010</span></li>
+        <li class="tour-row"><span class="t-city">Ottawa</span><span class="t-country">Canada</span><span class="t-pills"><span class="pill">Leonardo da Vinci - 500 Years of Genius</span></span><span class="t-year">2019</span></li>
+        <li class="tour-row"><span class="t-city">Regina</span><span class="t-country">Canada</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2013</span></li>
+        <li class="tour-row"><span class="t-city">Toronto</span><span class="t-country">Canada</span><span class="t-pills"><span class="pill">Leonardo da Vinci - 500 Years of Genius</span></span><span class="t-year">2026</span></li>
+        <li class="tour-row"><span class="t-city">Vancouver</span><span class="t-country">Canada</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2012</span></li>
+        <li class="tour-row"><span class="t-city">Winnipeg</span><span class="t-country">Canada</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span><span class="pill">Planet Shark</span></span><span class="t-year">2011</span></li>
+        <li class="tour-row"><span class="t-city">Albuquerque</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Anchorage</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2015</span></li>
+        <li class="tour-row"><span class="t-city">Asheville (Biltmore)</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span><span class="pill">Monet &amp; Friends Alive</span><span class="pill">Italian Renaissance Alive</span></span><span class="t-year">2021 - 2023</span></li>
+        <li class="tour-row"><span class="t-city">Atlanta</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Planet Shark</span></span><span class="t-year">2009</span></li>
+        <li class="tour-row"><span class="t-city">Baltimore</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2010</span></li>
+        <li class="tour-row"><span class="t-city">Boise</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Planet Shark</span></span><span class="t-year">2017</span></li>
+        <li class="tour-row"><span class="t-city">Boston</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2016</span></li>
+        <li class="tour-row"><span class="t-city">Charlestown</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Charlotte</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">101 Inventions That Changed The World</span></span><span class="t-year">2014</span></li>
+        <li class="tour-row"><span class="t-city">Cincinnati</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2016</span></li>
+        <li class="tour-row"><span class="t-city">Dallas</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Planet Shark</span></span><span class="t-year">2011</span></li>
+        <li class="tour-row"><span class="t-city">Denver</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span></span><span class="t-year">2019, 2021, 2022</span></li>
+        <li class="tour-row"><span class="t-city">Denver</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Dalí Alive</span></span><span class="t-year">2022</span></li>
+        <li class="tour-row"><span class="t-city">Des Moines</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2010</span></li>
+        <li class="tour-row"><span class="t-city">Fort Smith</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Secrets of Mona Lisa</span></span><span class="t-year">2013</span></li>
+        <li class="tour-row"><span class="t-city">Greensboro</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Leonardo da Vinci - 500 Years of Genius</span></span><span class="t-year">2027</span></li>
+        <li class="tour-row"><span class="t-city">Honolulu</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Planet Shark</span></span><span class="t-year">2016</span></li>
+        <li class="tour-row"><span class="t-city">Huntsville</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span><span class="pill">Inventing Genius</span></span><span class="t-year">2014</span></li>
+        <li class="tour-row"><span class="t-city">Indianapolis</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Monet &amp; Friends Alive</span><span class="pill">Connection: First Nations</span><span class="pill">Dalí Alive</span></span><span class="t-year">2021 - 2025</span></li>
+        <li class="tour-row"><span class="t-city">Kansas City</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2021, 2022</span></li>
+        <li class="tour-row"><span class="t-city">Las Vegas</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2012</span></li>
+        <li class="tour-row"><span class="t-city">Los Angeles</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Street Art Alive</span></span><span class="t-year">2022</span></li>
+        <li class="tour-row"><span class="t-city">Louisville</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2011</span></li>
+        <li class="tour-row"><span class="t-city">Lubbock</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2011</span></li>
+        <li class="tour-row"><span class="t-city">Miami</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span></span><span class="t-year">2018, 2025</span></li>
+        <li class="tour-row"><span class="t-city">Montreal</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Planet Shark</span></span><span class="t-year">2013</span></li>
+        <li class="tour-row"><span class="t-city">New Jersey</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2020</span></li>
+        <li class="tour-row"><span class="t-city">Oklahoma City</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2016</span></li>
+        <li class="tour-row"><span class="t-city">Peoria</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2019</span></li>
+        <li class="tour-row"><span class="t-city">Philadelphia</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">101 Inventions That Changed The World</span></span><span class="t-year">2014</span></li>
+        <li class="tour-row"><span class="t-city">Phoenix</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci — The Genius</span><span class="pill">Planet Shark</span></span><span class="t-year">2017</span></li>
+        <li class="tour-row"><span class="t-city">Portland, ME</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Planet Shark</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Portland, OR</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2009</span></li>
+        <li class="tour-row"><span class="t-city">Reading</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Secrets of Mona Lisa</span><span class="pill">101 Inventions That Changed The World</span></span><span class="t-year">2015</span></li>
+        <li class="tour-row"><span class="t-city">Richmond</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Leonardo da Vinci - 500 Years of Genius</span><span class="pill">Planet Shark</span></span><span class="t-year">2017, 2022</span></li>
+        <li class="tour-row"><span class="t-city">Rochester</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2015</span></li>
+        <li class="tour-row"><span class="t-city">Salt Lake City</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span><span class="pill">Inventing Genius</span></span><span class="t-year">2012</span></li>
+        <li class="tour-row"><span class="t-city">San Francisco</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2007</span></li>
+        <li class="tour-row"><span class="t-city">San Francisco</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Planet Shark</span></span><span class="t-year">2021</span></li>
+        <li class="tour-row"><span class="t-city">Santa Ana</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2013</span></li>
+        <li class="tour-row"><span class="t-city">Seattle</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci Inventions</span></span><span class="t-year">2021</span></li>
+        <li class="tour-row"><span class="t-city">St Paul</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Inventing Genius</span></span><span class="t-year">2019</span></li>
+        <li class="tour-row"><span class="t-city">St Petersburg</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Dalí Alive</span><span class="pill">Klimt Alive</span></span><span class="t-year">2020, 2023, 2026</span></li>
+        <li class="tour-row"><span class="t-city">Sudbury</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">101 Inventions That Changed The World</span></span><span class="t-year">2017</span></li>
+        <li class="tour-row"><span class="t-city">Tampa</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2010</span></li>
+        <li class="tour-row"><span class="t-city">Washington DC</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2010</span></li>
+        <li class="tour-row"><span class="t-city">Wichita</span><span class="t-country">USA</span><span class="t-pills"><span class="pill">Planet Shark</span></span><span class="t-year">2018</span></li>
+      </ul>
+    </section>
+    <section class="region" data-region="Asia" id="region-asia">
+      <div class="region-head">
+        <h3>Asia</h3>
+      </div>
+      <ul class="tour-list">
+        <li class="tour-row"><span class="t-city">Beijing</span><span class="t-country">China</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2021 - 2023</span></li>
+        <li class="tour-row"><span class="t-city">Chengdu</span><span class="t-country">China</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2022</span></li>
+        <li class="tour-row"><span class="t-city">Fuzhou</span><span class="t-country">China</span><span class="t-pills"><span class="pill">Secrets of Mona Lisa</span></span><span class="t-year">2015</span></li>
+        <li class="tour-row"><span class="t-city">Guangzhou</span><span class="t-country">China</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2015</span></li>
+        <li class="tour-row"><span class="t-city">Hangzhou</span><span class="t-country">China</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2015</span></li>
+        <li class="tour-row"><span class="t-city">Hong Kong</span><span class="t-country">China</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2019 &amp; 2025</span></li>
+        <li class="tour-row"><span class="t-city">Macau</span><span class="t-country">China</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2008</span></li>
+        <li class="tour-row"><span class="t-city">Qingdao</span><span class="t-country">China</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2015</span></li>
+        <li class="tour-row"><span class="t-city">Shanghai</span><span class="t-country">China</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2014 &amp; 2023</span></li>
+        <li class="tour-row"><span class="t-city">Xiamen</span><span class="t-country">China</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2015</span></li>
+        <li class="tour-row"><span class="t-city">Jakarta</span><span class="t-country">Indonesia</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2023</span></li>
+        <li class="tour-row"><span class="t-city">Fukuoka</span><span class="t-country">Japan</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2023</span></li>
+        <li class="tour-row"><span class="t-city">Kobe</span><span class="t-country">Japan</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2023 &amp; 2025</span></li>
+        <li class="tour-row"><span class="t-city">Nagoya</span><span class="t-country">Japan</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2022</span></li>
+        <li class="tour-row"><span class="t-city">Osaka</span><span class="t-country">Japan</span><span class="t-pills"><span class="pill">Monet &amp; Friends Alive</span><span class="pill">Klimt Alive</span></span><span class="t-year">2024 &amp; 2025</span></li>
+        <li class="tour-row"><span class="t-city">Tokyo</span><span class="t-country">Japan</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci — The Genius</span><span class="pill">Monet &amp; Friends Alive</span><span class="pill">Klimt Alive</span></span><span class="t-year">2010 &amp; 2024 - 2025</span></li>
+        <li class="tour-row"><span class="t-city">Almaty</span><span class="t-country">Kazakhstan</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span><span class="pill">Monet &amp; Friends Alive</span><span class="pill">101 Inventions That Changed The World</span></span><span class="t-year">2014</span></li>
+        <li class="tour-row"><span class="t-city">Seoul</span><span class="t-country">Korea</span><span class="t-pills"><span class="pill">Leonardo da Vinci - 500 Years of Genius</span><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2017</span></li>
+        <li class="tour-row"><span class="t-city">Kuala Lumpur</span><span class="t-country">Malaysia</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2009 &amp; 2022</span></li>
+        <li class="tour-row"><span class="t-city">Manila</span><span class="t-country">Philippines</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci Inventions</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2021, 2023 &amp; 2024</span></li>
+        <li class="tour-row"><span class="t-city">Singapore</span><span class="t-country">Singapore</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci — The Genius</span><span class="pill">Planet Shark</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2009, 2011, 2024</span></li>
+        <li class="tour-row"><span class="t-city">Kaohsiung</span><span class="t-country">Taiwan</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci — The Genius</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2020 &amp; 2021</span></li>
+        <li class="tour-row"><span class="t-city">Tainan City</span><span class="t-country">Taiwan</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2022</span></li>
+        <li class="tour-row"><span class="t-city">Taipei</span><span class="t-country">Taiwan</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci — The Genius</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2020, 2021, 2023</span></li>
+        <li class="tour-row"><span class="t-city">Bangkok</span><span class="t-country">Thailand</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2023 - 2024</span></li>
+      </ul>
+    </section>
+    <section class="region" data-region="Central &amp; South America" id="region-central-south-america">
+      <div class="region-head">
+        <h3>Central &amp; South America</h3>
+      </div>
+      <ul class="tour-list">
+        <li class="tour-row"><span class="t-city">Buenos Aires</span><span class="t-country">Argentina</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2009</span></li>
+        <li class="tour-row"><span class="t-city">La Paz</span><span class="t-country">Bolivia</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2009</span></li>
+        <li class="tour-row"><span class="t-city">Santa Cruz</span><span class="t-country">Bolivia</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2009</span></li>
+        <li class="tour-row"><span class="t-city">Curitiba</span><span class="t-country">Brazil</span><span class="t-pills"><span class="pill">Alice</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Porto Alegre</span><span class="t-country">Brazil</span><span class="t-pills"><span class="pill">Alice</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Rio de Janeiro</span><span class="t-country">Brazil</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2008</span></li>
+        <li class="tour-row"><span class="t-city">São Paulo</span><span class="t-country">Brazil</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span></span><span class="t-year">2008</span></li>
+        <li class="tour-row"><span class="t-city">Santiago</span><span class="t-country">Chile</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci Inventions</span><span class="pill">Monet &amp; Friends Alive</span><span class="pill">Planet Shark</span></span><span class="t-year">2008</span></li>
+        <li class="tour-row"><span class="t-city">Bogota</span><span class="t-country">Colombia</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2013</span></li>
+        <li class="tour-row"><span class="t-city">Cali</span><span class="t-country">Colombia</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2010</span></li>
+        <li class="tour-row"><span class="t-city">Medellín</span><span class="t-country">Colombia</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2010</span></li>
+        <li class="tour-row"><span class="t-city">San Jose</span><span class="t-country">Costa Rica</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2011</span></li>
+        <li class="tour-row"><span class="t-city">Guayaquil</span><span class="t-country">Ecuador</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2010</span></li>
+        <li class="tour-row"><span class="t-city">Mexico City</span><span class="t-country">Mexico</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2021 &amp; 2022</span></li>
+        <li class="tour-row"><span class="t-city">Puebla</span><span class="t-country">Mexico</span><span class="t-pills"><span class="pill">Leonardo da Vinci - 500 Years of Genius</span></span><span class="t-year">2020</span></li>
+        <li class="tour-row"><span class="t-city">Toluca</span><span class="t-country">Mexico</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2017 &amp; 2021</span></li>
+        <li class="tour-row"><span class="t-city">Panama City</span><span class="t-country">Panama</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2012</span></li>
+        <li class="tour-row"><span class="t-city">Lima</span><span class="t-country">Peru</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2011</span></li>
+        <li class="tour-row"><span class="t-city">San Juan</span><span class="t-country">Puerto Rico</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2012</span></li>
+        <li class="tour-row"><span class="t-city">Port-of-Spain</span><span class="t-country">Trinidad &amp; Tobago</span><span class="t-pills"><span class="pill">101 Inventions That Changed The World</span></span><span class="t-year">2013</span></li>
+        <li class="tour-row"><span class="t-city">Caracas</span><span class="t-country">Venezuala</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2012</span></li>
+      </ul>
+    </section>
+    <section class="region" data-region="Australasia" id="region-australasia">
+      <div class="region-head">
+        <h3>Australasia</h3>
+      </div>
+      <ul class="tour-list">
+        <li class="tour-row"><span class="t-city">Adelaide</span><span class="t-country">Austraila</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2021</span></li>
+        <li class="tour-row"><span class="t-city">Brisbane</span><span class="t-country">Austraila</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2021 &amp; 2023</span></li>
+        <li class="tour-row"><span class="t-city">Canberra</span><span class="t-country">Austraila</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span><span class="pill">Connection</span></span><span class="t-year">2022, 2023, 2026</span></li>
+        <li class="tour-row"><span class="t-city">Fremantle</span><span class="t-country">Austraila</span><span class="t-pills"><span class="pill">Planet Shark</span></span><span class="t-year">2019</span></li>
+        <li class="tour-row"><span class="t-city">Gold Coast</span><span class="t-country">Austraila</span><span class="t-pills"><span class="pill">Italian Renaissance Alive</span></span><span class="t-year">2024</span></li>
+        <li class="tour-row"><span class="t-city">Melbourne</span><span class="t-country">Austraila</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Da Vinci Inventions</span><span class="pill">Monet &amp; Friends Alive</span><span class="pill">Connection</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span></span><span class="t-year">2006, 2021 - 2025</span></li>
+        <li class="tour-row"><span class="t-city">Newcastle</span><span class="t-country">Austraila</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2022</span></li>
+        <li class="tour-row"><span class="t-city">Perth</span><span class="t-country">Austraila</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2022 &amp; 2023</span></li>
+        <li class="tour-row"><span class="t-city">Sydney</span><span class="t-country">Austraila</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Planet Shark</span><span class="pill">Monet &amp; Friends Alive</span></span><span class="t-year">2021</span></li>
+        <li class="tour-row"><span class="t-city">Auckland</span><span class="t-country">New Zealand</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2021</span></li>
+        <li class="tour-row"><span class="t-city">Christchurch</span><span class="t-country">New Zealand</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2021</span></li>
+        <li class="tour-row"><span class="t-city">Palmerston North</span><span class="t-country">New Zealand</span><span class="t-pills"><span class="pill">Secrets of Mona Lisa</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Upper Hutt</span><span class="t-country">New Zealand</span><span class="t-pills"><span class="pill">Secrets of Mona Lisa</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Wellington</span><span class="t-country">New Zealand</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2020 &amp; 2021</span></li>
+      </ul>
+    </section>
+    <section class="region" data-region="Middle East" id="region-middle-east">
+      <div class="region-head">
+        <h3>Middle East</h3>
+      </div>
+      <ul class="tour-list">
+        <li class="tour-row"><span class="t-city">Haifa</span><span class="t-country">Israel</span><span class="t-pills"><span class="pill">101 Inventions That Changed The World</span></span><span class="t-year">2012</span></li>
+        <li class="tour-row"><span class="t-city">Tel Aviv</span><span class="t-country">Israel</span><span class="t-pills"><span class="pill">Van Gogh Alive</span><span class="pill">Leonardo da Vinci - 500 Years of Genius</span><span class="pill">Planet Shark</span></span><span class="t-year">2014, 2015</span></li>
+        <li class="tour-row"><span class="t-city">Dhahran</span><span class="t-country">Saudi Arabia</span><span class="t-pills"><span class="pill">101 Inventions That Changed The World</span></span><span class="t-year">2013</span></li>
+        <li class="tour-row"><span class="t-city">Abu Dhabi</span><span class="t-country">UAE</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2018</span></li>
+        <li class="tour-row"><span class="t-city">Dubai</span><span class="t-country">UAE</span><span class="t-pills"><span class="pill">Van Gogh Alive</span></span><span class="t-year">2018</span></li>
+      </ul>
+    </section>
+    <section class="region" data-region="Africa" id="region-africa">
+      <div class="region-head">
+        <h3>Africa</h3>
+      </div>
+      <ul class="tour-list">
+        <li class="tour-row"><span class="t-city">Cape Town</span><span class="t-country">South Africa</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2013</span></li>
+        <li class="tour-row"><span class="t-city">Johannesburg</span><span class="t-country">South Africa</span><span class="t-pills"><span class="pill">Da Vinci — The Genius</span></span><span class="t-year">2014</span></li>
+      </ul>
+    </section>
+  </div>
+  <p id="empty-state">No cities match that search.</p>
+
+  <footer>
+    <p>Grande Experiences · Source: internal touring history, correct as of 1 July 2026</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var regionsEl = document.getElementById('regions');
+  var sections = Array.prototype.slice.call(regionsEl.querySelectorAll('.region'));
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
+  var search = document.getElementById('search');
+  var emptyState = document.getElementById('empty-state');
+  var activeRegion = 'all';
+
+  chips.forEach(function(chip){
+    chip.addEventListener('click', function(){
+      chips.forEach(function(c){ c.setAttribute('aria-pressed','false'); });
+      chip.setAttribute('aria-pressed','true');
+      activeRegion = chip.getAttribute('data-region');
+      applyFilters();
+    });
+  });
+
+  search.addEventListener('input', applyFilters);
+
+  function applyFilters(){
+    var q = search.value.trim().toLowerCase();
+    var anyVisible = false;
+    sections.forEach(function(section){
+      var region = section.getAttribute('data-region');
+      var regionMatch = (activeRegion === 'all' || activeRegion === region);
+      var rows = Array.prototype.slice.call(section.querySelectorAll('.tour-row'));
+      var sectionHasVisible = false;
+      rows.forEach(function(row){
+        var text = row.textContent.toLowerCase();
+        var rowMatch = regionMatch && (q === '' || text.indexOf(q) !== -1);
+        row.style.display = rowMatch ? '' : 'none';
+        if(rowMatch){ sectionHasVisible = true; anyVisible = true; }
+      });
+      section.style.display = sectionHasVisible ? '' : 'none';
+    });
+    emptyState.style.display = anyVisible ? 'none' : 'block';
+  }
+})();
+</script>
 
